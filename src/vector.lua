@@ -1,32 +1,31 @@
-local M = {}
+Vector = {}
+Vector.__index = Vector
 
-M.new = function(x, y)
-	return { x = x or 0, y = y or 0 }
+function Vector:new(x, y)
+	local vec = setmetatable({}, Vector)
+	vec.x = x or 0
+	vec.y = y or 0
+	return vec
 end
 
-M.normalize = function(v)
-	local len = math.sqrt(v.x * v.x + v.y * v.y)
+function Vector:normalize()
+	local len = math.sqrt(self.x * self.x + self.y * self.y)
 	if len > 0 then
-		return { x = v.x / len, y = v.y / len }
+		self.x = self.x / len
+		self.y = self.y / len
 	else
-		return { x = 0, y = 0 }
+		self.x = 0
+		self.y = 0
 	end
 end
 
-M.scale = function(vec, s)
-	return { x = vec.x * s, y = vec.y * s }
+function Vector:scale(s)
+	self.x = self.x * s
+	self.y = self.y * s
 end
 
-M.add = function(v1, v2)
+function Vector:__add(v1, v2)
 	return { x = v1.x + v2.x, y = v1.y + v2.y }
 end
 
-M.length = function(v)
-	return math.sqrt(v.x * v.x + v.y * v.y)
-end
-
-M.subtract = function(v1, v2)
-	return { x = v1.x - v2.x, y = v1.y - v2.y }
-end
-
-return M
+return Vector
