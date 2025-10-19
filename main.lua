@@ -3,6 +3,7 @@ local Bullet = require("src.bullet")
 local ww, wh = love.graphics.getDimensions()
 local title = love.graphics.newText(love.graphics.newFont(32), "Dodge The Bullets!")
 local points = 0
+local ellapsed_time = 0
 local next_bullet_time = 0
 local bullets = {}
 local game_running = true
@@ -33,20 +34,21 @@ function love.update(dt)
 		print("Spawning bullet at x: " .. x_pos)
 		local b = Bullet:new(x_pos)
 		bullets[#bullets + 1] = b
-		next_bullet_time = math.max(0.2, 1.0 - points / 100)
+		next_bullet_time = math.max(0.05, 1.0 - ellapsed_time / 30)
 	end
 
 	for i, b in ipairs(bullets) do
 		b:move(dt)
-		if b.y > wh then
+		if b.y > wh + 50 then
 			table.remove(bullets, i)
+			points = points + 5
 		elseif b:checkCollision(player, wh) then
 			game_running = false
 		end
 	end
 
 	player:move(direction, dt, ww)
-	points = points + dt * 10
+	ellapsed_time = ellapsed_time + dt
 	next_bullet_time = next_bullet_time - dt
 end
 
@@ -57,6 +59,7 @@ function love.keypressed(key)
 	if key == "r" then
 		-- Reset the game
 		game_running = true
+		ellapsed_time = 0
 		points = 0
 		bullets = {}
 		player:reset()

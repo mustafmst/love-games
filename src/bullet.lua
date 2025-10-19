@@ -1,4 +1,4 @@
-local Bullet = { speed = 400, y = 50, x = 200 }
+local Bullet = { speed = 400, y = 50, x = 200, angle = 0, dx = 0, dy = 0 }
 Bullet.__index = Bullet
 
 function Bullet.load()
@@ -8,7 +8,16 @@ function Bullet.load()
 end
 
 function Bullet:new(x)
-	local obj = { x = x or Bullet.x, y = Bullet.y, speed = Bullet.speed }
+	local angle = math.rad(math.random(-23, 23))
+	local speed_variation = math.random(-100, 100)
+	local obj = {
+		x = x or Bullet.x,
+		y = Bullet.y,
+		speed = Bullet.speed + speed_variation,
+		angle = angle,
+		dx = math.sin(angle),
+		dy = math.cos(angle),
+	}
 	setmetatable(obj, Bullet)
 	return obj
 end
@@ -18,12 +27,13 @@ end
 -- end
 
 function Bullet:move(dt)
-	self.y = self.y + self.speed * dt
+	self.x = self.x - self.dx * self.speed * dt
+	self.y = self.y + self.dy * self.speed * dt
 end
 
 function Bullet:draw()
 	if Bullet.image ~= nil then
-		love.graphics.draw(Bullet.image, self.x - 2.5, self.y - 11, 0, 1, 1, 0, 0)
+		love.graphics.draw(Bullet.image, self.x - 2.5, self.y - 11, self.angle, 1, 1, 0, 0)
 	end
 end
 
