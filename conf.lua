@@ -1,7 +1,7 @@
 function love.conf(t)
-	t.identity = "my_love_game"
-	t.window.title = "Game"
+	t.identity = "dodge_the_bullets"
+	t.window.title = "Dodge the Bullets"
 	t.window.width = 800
-	t.window.height = 600
+	t.window.height = 800
 	t.window.vsync = true
 end
