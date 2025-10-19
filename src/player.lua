@@ -1,3 +1,4 @@
+local size, half_size = 22, 11
 local Player = { x = 400, speed = 500 }
 Player.__index = Player
 
@@ -11,16 +12,16 @@ function Player:load()
 	self.image = love.graphics.newImage("assets/images/player.jpg")
 end
 
-function Player:move(direction, dt)
+function Player:move(direction, dt, ww)
 	if direction > 0 then
 		self.x = self.x - self.speed * dt
-		if self.x < 11 then
-			self.x = 11
+		if self.x < half_size then
+			self.x = half_size
 		end
 	elseif direction < 0 then
 		self.x = self.x + self.speed * dt
-		if self.x > 789 then
-			self.x = 789
+		if self.x > ww - half_size then
+			self.x = ww - half_size
 		end
 	end
 end
@@ -32,7 +33,7 @@ end
 
 function Player:draw(wh)
 	if self.image ~= nil then
-		love.graphics.draw(self.image, self.x - 11, wh - 22 - 10, 0, 1, 1, 0, 0)
+		love.graphics.draw(self.image, self.x - half_size, wh - size - half_size, 0, 1, 1, 0, 0)
 	end
 end
 
