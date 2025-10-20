@@ -9,13 +9,12 @@ function Bullet.load()
 	end
 end
 
-function Bullet:new(x)
-	local angle = math.rad(math.random(-23, 23))
+function Bullet:new(start, direction)
 	local speed_variation = math.random(-100, 100)
 	local obj = {
-		pos = Vector:new(x, Bullet.pos.y),
-		angle = angle,
-		mv = Vector:new(-math.sin(angle), math.cos(angle)):normalize():scale(Bullet.speed + speed_variation),
+		pos = start,
+		angle = direction:angle(),
+		mv = direction:scale(Bullet.speed + speed_variation),
 		r = Bullet.r,
 	}
 	setmetatable(obj, Bullet)
@@ -28,7 +27,7 @@ end
 
 function Bullet:draw()
 	if Bullet.image ~= nil then
-		love.graphics.draw(Bullet.image, self.pos.x - 2.5, self.pos.y - 11, self.pos.angle, 1, 1, 0, 0)
+		love.graphics.draw(Bullet.image, self.pos.x - 2.5, self.pos.y - 11, self.angle, 1, 1, 0, 0)
 	end
 end
 

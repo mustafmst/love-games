@@ -41,7 +41,11 @@ function love.update(dt)
 	if next_bullet_time <= 0 then
 		local x_pos = math.random(20, ww - 20)
 		print("Spawning bullet at x: " .. x_pos)
-		local b = Bullet:new(x_pos)
+		local b_pos = Vector:new(x_pos, -50)
+		local b = Bullet:new(
+			b_pos,
+			b_pos:direction_to(player.pos:add(Vector:new(math.random(-20, 20), math.random(-20, 20))))
+		)
 		bullets[#bullets + 1] = b
 		next_bullet_time = math.max(0.05, 1.0 - ellapsed_time / 30)
 	end
