@@ -1,4 +1,5 @@
 local Vector = require("src.vector")
+local ww, wh = love.graphics.getDimensions()
 
 local half_size = 11
 local Player = { pos = Vector:zero(), speed = 500, r = 12, start = Vector:zero() }
@@ -14,13 +15,19 @@ function Player:load()
 	self.image = love.graphics.newImage("assets/images/player.png")
 end
 
-function Player:move(direction, dt, ww)
-	self.pos = self.pos:add(Vector:new(-direction * self.speed * dt, 0))
+function Player:move(direction, dt)
+	self.pos = self.pos:add(direction:scale(self.speed * dt))
 	if self.pos.x < half_size then
 		self.pos.x = half_size
 	end
 	if self.pos.x > ww - half_size then
 		self.pos.x = ww - half_size
+	end
+	if self.pos.y < half_size then
+		self.pos.y = half_size
+	end
+	if self.pos.y > wh - half_size then
+		self.pos.y = wh - half_size
 	end
 end
 

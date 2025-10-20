@@ -21,13 +21,21 @@ function love.update(dt)
 	if not game_running then
 		return
 	end
-	local direction = 0
+	local direction = Vector:zero()
 	if love.keyboard.isDown("right", "d") then
-		direction = direction - 1
+		direction.x = direction.x + 1
 	end
 
 	if love.keyboard.isDown("left", "a") then
-		direction = direction + 1
+		direction.x = direction.x - 1
+	end
+
+	if love.keyboard.isDown("up", "w") then
+		direction.y = direction.y - 1
+	end
+
+	if love.keyboard.isDown("down", "s") then
+		direction.y = direction.y + 1
 	end
 
 	if next_bullet_time <= 0 then
@@ -48,7 +56,7 @@ function love.update(dt)
 		end
 	end
 
-	player:move(direction, dt, ww)
+	player:move(direction:normalize(), dt, ww)
 	ellapsed_time = ellapsed_time + dt
 	next_bullet_time = next_bullet_time - dt
 end
