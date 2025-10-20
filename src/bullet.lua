@@ -1,4 +1,4 @@
-local Bullet = { speed = 400, y = 50, x = 200, angle = 0, dx = 0, dy = 0 }
+local Bullet = { speed = 400, y = 50, x = 200, angle = 0, dx = 0, dy = 0, r = 5 }
 Bullet.__index = Bullet
 
 function Bullet.load()
@@ -17,14 +17,11 @@ function Bullet:new(x)
 		angle = angle,
 		dx = math.sin(angle),
 		dy = math.cos(angle),
+		r = Bullet.r,
 	}
 	setmetatable(obj, Bullet)
 	return obj
 end
-
--- function Bullet.load()
--- 	self.image = love.graphics.newImage("assets/images/bullet.jpg")
--- end
 
 function Bullet:move(dt)
 	self.x = self.x - self.dx * self.speed * dt
@@ -37,24 +34,10 @@ function Bullet:draw()
 	end
 end
 
-function Bullet:checkCollision(player, wh)
-	-- Simple AABB collision detection
-	local bullet_left = self.x - 2.5
-	local bullet_right = self.x + 2.5
-	local bullet_top = self.y - 11
-	local bullet_bottom = self.y + 11
-
-	local player_left = player.x - 11
-	local player_right = player.x + 11
-	local player_top = wh - 22 - 11
-	local player_bottom = wh - 11
-
-	if
-		bullet_right > player_left
-		and bullet_left < player_right
-		and bullet_bottom > player_top
-		and bullet_top < player_bottom
-	then
+function Bullet:checkCollision(player)
+	-- radius collision detection
+	local distance = math.sqrt((self.x - player.x) ^ 2 + (self.y - player.y) ^ 2)
+	if distance < self.r + player.r then
 		return true
 	end
 	return false
