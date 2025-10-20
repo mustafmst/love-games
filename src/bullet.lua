@@ -1,9 +1,11 @@
-local Bullet = { speed = 400, y = 50, x = 200, angle = 0, dx = 0, dy = 0, r = 5 }
+local Vector = require("src.vector")
+
+local Bullet = { speed = 400, pos = Vector:new(200, 50), angle = 0, r = 5, mv = Vector:zero() }
 Bullet.__index = Bullet
 
 function Bullet.load()
 	if Bullet.image == nil then
-		Bullet.image = love.graphics.newImage("assets/images/bullet.jpg")
+		Bullet.image = love.graphics.newImage("assets/images/bullet.png")
 	end
 end
 
@@ -11,12 +13,9 @@ function Bullet:new(x)
 	local angle = math.rad(math.random(-23, 23))
 	local speed_variation = math.random(-100, 100)
 	local obj = {
-		x = x or Bullet.x,
-		y = Bullet.y,
-		speed = Bullet.speed + speed_variation,
+		pos = Vector:new(x, Bullet.pos.y),
 		angle = angle,
-		dx = math.sin(angle),
-		dy = math.cos(angle),
+		mv = Vector:new(-math.sin(angle), math.cos(angle)):normalize():scale(Bullet.speed + speed_variation),
 		r = Bullet.r,
 	}
 	setmetatable(obj, Bullet)
@@ -24,19 +23,18 @@ function Bullet:new(x)
 end
 
 function Bullet:move(dt)
-	self.x = self.x - self.dx * self.speed * dt
-	self.y = self.y + self.dy * self.speed * dt
+	self.pos = self.pos:add(self.mv:scale(dt))
 end
 
 function Bullet:draw()
 	if Bullet.image ~= nil then
-		love.graphics.draw(Bullet.image, self.x - 2.5, self.y - 11, self.angle, 1, 1, 0, 0)
+		love.graphics.draw(Bullet.image, self.pos.x - 2.5, self.pos.y - 11, self.pos.angle, 1, 1, 0, 0)
 	end
 end
 
 function Bullet:checkCollision(player)
 	-- radius collision detection
-	local distance = math.sqrt((self.x - player.x) ^ 2 + (self.y - player.y) ^ 2)
+	local distance = math.sqrt((self.pos.x - player.pos.x) ^ 2 + (self.pos.y - player.pos.y) ^ 2)
 	if distance < self.r + player.r then
 		return true
 	end

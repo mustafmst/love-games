@@ -1,6 +1,7 @@
 local Bullet = require("src.bullet")
+local Vector = require("src.vector")
 local ww, wh = love.graphics.getDimensions()
-local player = require("src.player"):new(0, wh)
+local player = require("src.player"):new(Vector:new(ww / 2, wh - 50))
 local title = love.graphics.newText(love.graphics.newFont(32), "Dodge The Bullets!")
 local points = 0
 local ellapsed_time = 0
@@ -39,7 +40,7 @@ function love.update(dt)
 
 	for i, b in ipairs(bullets) do
 		b:move(dt)
-		if b.y > wh + 50 then
+		if b.pos.y > wh + 50 then
 			table.remove(bullets, i)
 			points = points + 5
 		elseif b:checkCollision(player) then
