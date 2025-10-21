@@ -40,7 +40,6 @@ function love.update(dt)
 
 	if next_bullet_time <= 0 then
 		local x_pos = math.random(-20, ww + 20)
-		print("Spawning bullet at x: " .. x_pos)
 		local b_pos = Vector:new(x_pos, 0)
 		local b = Bullet:new(
 			b_pos,
