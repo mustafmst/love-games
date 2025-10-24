@@ -1,11 +1,13 @@
 local Vector = require("src.vector")
 
-local Bullet = { speed = 400, pos = Vector:new(200, 50), angle = 0, r = 5, mv = Vector:zero() }
+local Bullet = { speed = 400, pos = Vector:new(200, 50), angle = 0, r = 5, mv = Vector:zero(), scale = 1.4 }
 Bullet.__index = Bullet
 
 function Bullet.load()
 	if Bullet.image == nil then
 		Bullet.image = love.graphics.newImage("assets/images/bullet.png")
+		Bullet.r = math.min(Bullet.image:getWidth(), Bullet.image:getHeight()) * 0.8
+		Bullet.imageOrigin = Vector:new(Bullet.image:getWidth() / 2, Bullet.image:getHeight() / 2)
 	end
 end
 
@@ -15,7 +17,6 @@ function Bullet:new(start, direction)
 		pos = start,
 		angle = direction:angle(),
 		mv = direction:scale(Bullet.speed + speed_variation),
-		r = Bullet.r,
 	}
 	setmetatable(obj, Bullet)
 	return obj
@@ -27,14 +28,30 @@ end
 
 function Bullet:draw()
 	if Bullet.image ~= nil then
-		love.graphics.draw(Bullet.image, self.pos.x - 2.5, self.pos.y - 11, self.angle, 1, 1, 0, 0)
+		love.graphics.draw(
+			Bullet.image,
+			self.pos.x - 2.5,
+			self.pos.y - 11,
+			self.angle - (math.pi / 2), -- angle
+			Bullet.scale,
+			Bullet.scale,
+			Bullet.imageOrigin.x,
+			Bullet.imageOrigin.y
+		)
+		-- debug
+		local tmp = self.pos:add(self.mv:normalize():scale(50))
+		love.graphics.setColor(1, 0, 0)
+		love.graphics.setLineWidth(2)
+		love.graphics.line(self.pos.x, self.pos.y, tmp.x, tmp.y)
+		love.graphics.circle("line", self.pos.x, self.pos.y, Bullet.r)
+		love.graphics.setColor(1, 1, 1)
 	end
 end
 
 function Bullet:checkCollision(player)
 	-- radius collision detection
 	local distance = math.sqrt((self.pos.x - player.pos.x) ^ 2 + (self.pos.y - player.pos.y) ^ 2)
-	if distance < self.r + player.r then
+	if distance < Bullet.r + player.r then
 		return true
 	end
 	return false
