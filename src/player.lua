@@ -3,11 +3,18 @@ local debug = true
 local Vector = require("src.vector")
 local ww, wh = love.graphics.getDimensions()
 
-local Player = { pos = Vector:zero(), speed = 500, r = 12, start = Vector:zero() }
+local Player =
+	{ pos = Vector:zero(), speed = 100, r = 12, start = Vector:zero(), velocity = Vector:zero(), friction = 0.91 }
 Player.__index = Player
 
 function Player:new(start)
-	local obj = { pos = start or Player.pos, speed = Player.speed, start = start or Player.start }
+	local obj = {
+		pos = start or Player.pos,
+		speed = Player.speed,
+		start = start or Player.start,
+		velocity = Player.velocity,
+		friction = Player.friction,
+	}
 	setmetatable(obj, Player)
 	return obj
 end
@@ -19,7 +26,10 @@ function Player:load()
 end
 
 function Player:move(direction, dt)
-	self.pos = self.pos:add(direction:scale(self.speed * dt))
+	local acceleration = direction:scale(self.speed * dt)
+	self.velocity = self.velocity:add(acceleration):scale(self.friction)
+	self.pos = self.pos:add(self.velocity)
+
 	if self.pos.x < self.imageOffset.x then
 		self.pos.x = self.imageOffset.x
 	end
