@@ -41,7 +41,7 @@ function Vector:direction_to(v)
 end
 
 function Vector:angle()
-	return math.atan2(self.y, self.x)
+	return math.atan2(self.y, self.x) - math.pi / 2
 end
 
 return Vector

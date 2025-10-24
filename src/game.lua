@@ -58,7 +58,11 @@ function Game:update(dt)
 	if self.next_bullet_time <= 0 then
 		local x_pos = math.random(-20, self.ww + 20)
 		local b_pos = Vector:new(x_pos, 0)
-		local b = Bullet:new(b_pos, b_pos:direction_to(Vector:new(math.random(-20, self.ww + 20), self.wh)))
+		local b = Bullet:new(
+			b_pos, -- start pos
+			b_pos:direction_to(Vector:new(math.random(-20, self.ww + 20), self.wh)) -- direction
+			-- Vector:new(math.random(-20, self.ww + 20), self.wh):direction_to(b_pos) -- direction
+		)
 		self.bullets[#self.bullets + 1] = b
 		self.next_bullet_time = math.max(0.05, 1.0 - self.ellapsed_time / 30)
 	end

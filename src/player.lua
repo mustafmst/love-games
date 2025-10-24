@@ -1,3 +1,5 @@
+local debug = true
+
 local Vector = require("src.vector")
 local ww, wh = love.graphics.getDimensions()
 
@@ -12,7 +14,7 @@ end
 
 function Player:load()
 	self.image = love.graphics.newImage("assets/images/player.png")
-	self.imageOffset = Vector:new(self.image:getWidth() / 2, self.image:getHeight() / 2)
+	self.imageOffset = Vector:new(self.image:getWidth() / 2, self.image:getHeight() / 2 + self.image:getHeight() * 0.1)
 	self.r = math.min(self.imageOffset.x, self.imageOffset.y) * 0.7
 end
 
@@ -40,6 +42,13 @@ end
 function Player:draw()
 	if self.image ~= nil then
 		love.graphics.draw(self.image, self.pos.x, self.pos.y, 0, 1, 1, self.imageOffset.x, self.imageOffset.y)
+
+		-- debug
+		if debug then
+			love.graphics.setColor(1, 0, 0)
+			love.graphics.circle("line", self.pos.x, self.pos.y, self.r)
+			love.graphics.setColor(1, 1, 1)
+		end
 	end
 end
 
