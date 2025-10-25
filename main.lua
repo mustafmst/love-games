@@ -2,7 +2,7 @@ local debug = true
 -- debug = false
 
 local Game = require("src.game")
-local WorldManager = require("src.world_manager")
+local wm = require("src.world_manager")
 
 local game_state = Game:new()
 
@@ -14,6 +14,7 @@ end
 function love.update(dt)
 	-- Game loop logic here
 	game_state:update(dt)
+	wm:detectCollisions()
 end
 
 function love.keypressed(key)
@@ -29,6 +30,6 @@ end
 function love.draw()
 	game_state:draw()
 	if debug then
-		WorldManager:debug_draw()
+		wm:debugDraw()
 	end
 end

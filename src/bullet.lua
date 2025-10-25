@@ -19,7 +19,7 @@ function Bullet:new(start, direction)
 		pos = start,
 		angle = direction:angle() - math.pi / 2, -- image from bottom to top so subtract 1/4 of a circle
 		mv = direction:scale(Bullet.speed + speed_variation),
-		body = wm:add_body(start, Bullet.r, "bullet", {}),
+		body = wm:addBody(start, Bullet.r, "bullet", {}),
 	}
 	setmetatable(obj, Bullet)
 	return obj

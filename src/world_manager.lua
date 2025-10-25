@@ -1,6 +1,6 @@
 local Vector = require("src.vector")
 
-local M = {
+local WorldManager = {
 	world = nil,
 }
 
@@ -44,31 +44,32 @@ function Body:clearEvents()
 	self.events = {}
 end
 
--- gives option to init a world with different properties
-function M:init()
+--- Initializes the world with default properties.
+-- This function sets up an empty world table.
+function WorldManager:init()
 	self.world = {}
 end
 
-function M:clear()
+function WorldManager:clear()
 	self.world = nil
 end
 
-function M:reset_world()
-	M:clear()
-	M:init()
+function WorldManager:resetWorld()
+	WorldManager:clear()
+	WorldManager:init()
 end
-function M:get_world()
+function WorldManager:getWorld()
 	if self.world == nil then
 		self:init() -- default world
 	end
 	return self.world
 end
 
-function M:is_initialized()
+function WorldManager:isInitialized()
 	return self.world ~= nil
 end
 
-function M:add_body(start_pos, r, class, filter)
+function WorldManager:addBody(start_pos, r, class, filter)
 	if self.world == nil then
 		error("WorldManager not initialized. Call WorldManager:init() before adding bodies.")
 	end
@@ -77,7 +78,7 @@ function M:add_body(start_pos, r, class, filter)
 	return body
 end
 
-function M:remove_body(body)
+function WorldManager:removeBody(body)
 	for i, b in ipairs(self.world) do
 		if b == body then
 			table.remove(self.world, i)
@@ -86,30 +87,38 @@ function M:remove_body(body)
 	end
 end
 
-function M:clear_events()
+function WorldManager:clearEvents()
 	for _, body in ipairs(self.world) do
 		body:clearEvents()
 	end
 end
 
-function M:detectCollisions()
-	self:clear_events()
-	for i = 1, #self.world do
-		local bodyA = self.world[i]
+--- Detects collisions between all bodies in the world.
+-- This function clears existing events and checks for collisions
+-- between all pairs of bodies using circle-circle collision detection.
+function WorldManager:detectCollisions()
+	self:clearEvents()
+	for i, bodyA in ipairs(self.world) do
 		for j = i + 1, #self.world do
-			local bodyB = self.world[j]
-			-- Simple circle-circle collision detection
-			local dist = bodyA.pos:distance_to(bodyB.pos)
-			if dist < (bodyA.r + bodyB.r) then
-				-- Collision detected
-				bodyA:createEvent("collision", { with = bodyB })
-				bodyB:createEvent("collision", { with = bodyA })
-			end
+			self:checkCollision(bodyA, self.world[j])
 		end
 	end
 end
 
-function M:debug_draw()
+--- Checks for a collision between two bodies and creates events if a collision is detected.
+-- @param bodyA The first body.
+-- @param bodyB The second body.
+function WorldManager:checkCollision(bodyA, bodyB)
+	-- Simple circle-circle collision detection
+	local dist = bodyA.pos:distance_to(bodyB.pos)
+	if dist < (bodyA.r + bodyB.r) then
+		-- Collision detected
+		bodyA:createEvent("collision", { with = bodyB })
+		bodyB:createEvent("collision", { with = bodyA })
+	end
+end
+
+function WorldManager:debugDraw()
 	if self.world == nil then
 		return
 	end
@@ -121,4 +130,4 @@ function M:debug_draw()
 	love.graphics.setColor(1, 1, 1)
 end
 
-return M
+return WorldManager

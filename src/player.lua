@@ -20,7 +20,7 @@ function Player:new(start)
 		start = start or Player.start,
 		velocity = Player.velocity,
 		friction = Player.friction,
-		body = wm:add_body(start or Player.pos, Player.r, "player", {}),
+		body = wm:addBody(start or Player.pos, Player.r, "player", {}),
 		hp = Player.hp,
 	}
 	setmetatable(obj, Player)
@@ -69,7 +69,7 @@ end
 function Player:reset()
 	self.pos = Vector:new(self.start.x, self.start.y)
 	self.speed = Player.speed
-	self.body = wm:add_body(self.pos, Player.r, "player", {})
+	self.body = wm:addBody(self.pos, Player.r, "player", {})
 	self.hp = Player.hp
 end
 

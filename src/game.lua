@@ -8,6 +8,7 @@ local Game = {}
 Game.__index = Game
 
 function Game:new()
+	-- init collision world
 	wm:init()
 	local instance = setmetatable({}, Game)
 	instance.ww, instance.wh = love.graphics.getDimensions()
@@ -22,14 +23,16 @@ function Game:new()
 end
 
 function Game:load()
-	wm:reset_world()
+	-- load assets
+	wm:resetWorld()
 	self.player:load()
 	self.player:reset()
 	Bullet.load()
 end
 
 function Game:reset()
-	wm:reset_world()
+	-- reset all thisng for new game
+	wm:resetWorld()
 	self.points = 0
 	self.ellapsed_time = 0
 	self.next_bullet_time = 0
@@ -59,6 +62,7 @@ function Game:update(dt)
 		direction.y = direction.y + 1
 	end
 
+	-- bullet creation
 	if self.next_bullet_time <= 0 then
 		local x_pos = math.random(-20, self.ww + 20)
 		local b_pos = Vector:new(x_pos, 0)
@@ -71,27 +75,31 @@ function Game:update(dt)
 		self.next_bullet_time = math.max(0.05, 1.0 - self.ellapsed_time / 30)
 	end
 
+	-- bullets move and collition events check
 	for i, b in ipairs(self.bullets) do
 		b:move(dt)
 		if b.pos.y > self.wh + 50 then
+			wm:removeBody(b.body)
 			table.remove(self.bullets, i)
 			self.points = self.points + 5
 		elseif b:checkCollision() then
-			wm:remove_body(b.body)
+			wm:removeBody(b.body)
 			table.remove(self.bullets, i)
-			-- self.game_running = false
 		end
 	end
 
+	-- stop game when HP is 0
 	if self.player.hp <= 0 then
 		self.game_running = false
 	end
 
+	-- player collision handling and movement
 	self.player:handleCollisions()
 	self.player:move(direction:normalize(), dt, self.ww)
+
+	-- bullet generation timers update
 	self.ellapsed_time = self.ellapsed_time + dt
 	self.next_bullet_time = self.next_bullet_time - dt
-	wm:detectCollisions()
 end
 
 function Game:draw()
@@ -104,6 +112,7 @@ function Game:draw()
 end
 
 function Game:draw_ui()
+	-- Points, Health, Title, Game Over
 	love.graphics.draw(self.title, self.ww / 2 - self.title:getWidth() / 2, 10)
 	local points_text = love.graphics.newText(love.graphics.newFont(24), "Points: " .. math.floor(self.points))
 	love.graphics.draw(points_text, self.ww - points_text:getWidth() - 10, 10)
