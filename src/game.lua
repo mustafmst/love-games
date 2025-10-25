@@ -1,16 +1,18 @@
 local Vector = require("src.vector")
 local Bullet = require("src.bullet")
 local Player = require("src.player")
-local Spawner = require("src.spawner")
+local wm = require("src.world_manager")
+-- local Spawner = require("src.spawner")
 
 local Game = {}
 Game.__index = Game
 
 function Game:new()
+	wm:init()
 	local instance = setmetatable({}, Game)
 	instance.ww, instance.wh = love.graphics.getDimensions()
 	instance.player = Player:new(Vector:new(instance.ww / 2, instance.wh - 50))
-	instance.title = love.graphics.newText(love.graphics.newFont(32), "Dodge Ball(s)!")
+	instance.title = love.graphics.newText(love.graphics.newFont(32), "Spaceship One")
 	instance.points = 0
 	instance.ellapsed_time = 0
 	instance.next_bullet_time = 0
@@ -20,12 +22,14 @@ function Game:new()
 end
 
 function Game:load()
+	wm:reset_world()
 	self.player:load()
 	self.player:reset()
 	Bullet.load()
 end
 
 function Game:reset()
+	wm:reset_world()
 	self.points = 0
 	self.ellapsed_time = 0
 	self.next_bullet_time = 0
@@ -72,14 +76,22 @@ function Game:update(dt)
 		if b.pos.y > self.wh + 50 then
 			table.remove(self.bullets, i)
 			self.points = self.points + 5
-		elseif b:checkCollision(self.player) then
-			self.game_running = false
+		elseif b:checkCollision() then
+			wm:remove_body(b.body)
+			table.remove(self.bullets, i)
+			-- self.game_running = false
 		end
 	end
 
+	if self.player.hp <= 0 then
+		self.game_running = false
+	end
+
+	self.player:handleCollisions()
 	self.player:move(direction:normalize(), dt, self.ww)
 	self.ellapsed_time = self.ellapsed_time + dt
 	self.next_bullet_time = self.next_bullet_time - dt
+	wm:detectCollisions()
 end
 
 function Game:draw()
@@ -95,6 +107,8 @@ function Game:draw_ui()
 	love.graphics.draw(self.title, self.ww / 2 - self.title:getWidth() / 2, 10)
 	local points_text = love.graphics.newText(love.graphics.newFont(24), "Points: " .. math.floor(self.points))
 	love.graphics.draw(points_text, self.ww - points_text:getWidth() - 10, 10)
+	local health_text = love.graphics.newText(love.graphics.newFont(24), "Health: " .. self.player.hp)
+	love.graphics.draw(health_text, 10, 10)
 	if not self.game_running then
 		local game_over_text = love.graphics.newText(love.graphics.newFont(48), "Game Over! Press 'R' to Restart")
 		love.graphics.draw(

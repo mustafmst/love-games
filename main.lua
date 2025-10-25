@@ -1,4 +1,8 @@
+local debug = true
+-- debug = false
+
 local Game = require("src.game")
+local WorldManager = require("src.world_manager")
 
 local game_state = Game:new()
 
@@ -24,4 +28,7 @@ end
 
 function love.draw()
 	game_state:draw()
+	if debug then
+		WorldManager:debug_draw()
+	end
 end

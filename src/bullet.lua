@@ -1,6 +1,6 @@
 local Vector = require("src.vector")
+local wm = require("src.world_manager")
 
-local debug = true
 local Bullet = { speed = 400, pos = Vector:new(200, 50), angle = 0, r = 5, mv = Vector:zero(), scale = 1.4 }
 Bullet.__index = Bullet
 
@@ -17,8 +17,9 @@ function Bullet:new(start, direction)
 	local speed_variation = math.random(-100, 100)
 	local obj = {
 		pos = start,
-		angle = direction:angle(),
+		angle = direction:angle() - math.pi / 2, -- image from bottom to top so subtract 1/4 of a circle
 		mv = direction:scale(Bullet.speed + speed_variation),
+		body = wm:add_body(start, Bullet.r, "bullet", {}),
 	}
 	setmetatable(obj, Bullet)
 	return obj
@@ -26,6 +27,7 @@ end
 
 function Bullet:move(dt)
 	self.pos = self.pos:add(self.mv:scale(dt))
+	self.body:update(self.pos)
 end
 
 function Bullet:draw()
@@ -41,23 +43,14 @@ function Bullet:draw()
 			Bullet.imageOrigin.x,
 			Bullet.imageOrigin.y
 		)
-		-- debug
-		if debug then
-			local tmp = self.pos:add(self.mv:normalize():scale(50))
-			love.graphics.setColor(1, 0, 0)
-			love.graphics.setLineWidth(2)
-			love.graphics.line(self.pos.x, self.pos.y, tmp.x, tmp.y)
-			love.graphics.circle("line", self.pos.x, self.pos.y, Bullet.r)
-			love.graphics.setColor(1, 1, 1)
-		end
 	end
 end
 
-function Bullet:checkCollision(player)
-	-- radius collision detection
-	local distance = math.sqrt((self.pos.x - player.pos.x) ^ 2 + (self.pos.y - player.pos.y) ^ 2)
-	if distance < Bullet.r + player.r then
-		return true
+function Bullet:checkCollision()
+	for _, collision in ipairs(self.body.events) do
+		if collision.type == "collision" and collision.data.with.class == "player" then
+			return true
+		end
 	end
 	return false
 end

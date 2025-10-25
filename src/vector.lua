@@ -41,7 +41,13 @@ function Vector:direction_to(v)
 end
 
 function Vector:angle()
-	return math.atan2(self.y, self.x) - math.pi / 2
+	return math.atan2(self.y, self.x) -- - math.pi / 2
+end
+
+function Vector:distance_to(v)
+	local dx = v.x - self.x
+	local dy = v.y - self.y
+	return math.sqrt(dx * dx + dy * dy)
 end
 
 return Vector
